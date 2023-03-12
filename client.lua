@@ -1,4 +1,7 @@
-local QBCore = exports['qb-core']:GetCoreObject()
+--local QBCore = exports['qb-core']:GetCoreObject()
+local ESX = nil
+TriggerEvent('og:getData', function(obj) ESX = obj end)
+
 local PlayerData = QBCore.Functions.GetPlayerData()
 local config = Config
 local UIConfig = UIConfig
@@ -73,7 +76,7 @@ local function CinematicShow(bool)
 end
 
 local function hasHarness()
-    local ped = PlayerPedId()
+    --[[local ped = PlayerPedId()
     if not IsPedInAnyVehicle(ped, false) then return end
 
     local _harness = false
@@ -84,7 +87,8 @@ local function hasHarness()
         _harness = false
     end
 
-    harness = _harness
+    harness = _harness]]
+    harness = false
 end
 
 local function loadSettings()
@@ -112,14 +116,16 @@ local function sendUIUpdateMessage(data)
 end
 
 local function HandleSetupResource()
-    QBCore.Functions.TriggerCallback('hud:server:getRank', function(isAdminOrGreater)
+    --[[QBCore.Functions.TriggerCallback('hud:server:getRank', function(isAdminOrGreater)
         if isAdminOrGreater then
             admin = true
         else
             admin = false
         end
         SendAdminStatus()
-    end)
+    end)]]
+    -- @todo add is admin check
+
     if Config.AdminOnly then
         -- Send the client what the saved ui config is (enforced by the server)
         if next(UIConfig) then
@@ -128,7 +134,7 @@ local function HandleSetupResource()
     end
 end
 
-RegisterNetEvent("QBCore:Client:OnPlayerLoaded", function()
+RegisterNetEvent("QBCore:Client:OnPlayerLoaded", function() -- @todo replace with ESX version
     Wait(2000)
     HandleSetupResource()
     -- local hudSettings = GetResourceKvpString('hudSettings')
@@ -137,13 +143,13 @@ RegisterNetEvent("QBCore:Client:OnPlayerLoaded", function()
     PlayerData = QBCore.Functions.GetPlayerData()
 end)
 
-RegisterNetEvent("QBCore:Client:OnPlayerUnload", function()
+RegisterNetEvent("QBCore:Client:OnPlayerUnload", function() -- @todo replace with ESX version
     PlayerData = {}
     admin = false
     SendAdminStatus()
 end)
 
-RegisterNetEvent("QBCore:Player:SetPlayerData", function(val)
+RegisterNetEvent("QBCore:Player:SetPlayerData", function(val) -- @todo replace with ESX version
     PlayerData = val
 end)
 
@@ -158,12 +164,12 @@ AddEventHandler('onResourceStart', function(resourceName)
     loadSettings()
 end)
 
-AddEventHandler("pma-voice:radioActive", function(isRadioTalking)
+AddEventHandler("pma-voice:radioActive", function(isRadioTalking) -- @todo check if compatible
     radioTalking = isRadioTalking
 end)
 
 -- Callbacks & Events
-RegisterCommand('menu', function()
+RegisterCommand('hudmenu', function()
     Wait(50)
     if showMenu then return end
     TriggerEvent("hud:client:playOpenMenuSounds")
@@ -180,12 +186,12 @@ RegisterNUICallback('closeMenu', function(_, cb)
     SetNuiFocus(false, false)
 end)
 
-RegisterKeyMapping('menu', Lang:t('info.open_menu'), 'keyboard', Config.OpenMenu)
+RegisterKeyMapping('hudmenu', Lang:t('info.open_menu'), 'keyboard', Config.OpenMenu)
 
 -- Reset hud
 local function restartHud()
     TriggerEvent("hud:client:playResetHudSounds")
-    QBCore.Functions.Notify(Lang:t("notify.hud_restart"), "error")
+    QBCore.Functions.Notify(Lang:t("notify.hud_restart"), "error") -- @todo replace with ox_lib notify
     Wait(1500)
     if IsPedInAnyVehicle(PlayerPedId()) then
         SendNUIMessage({
@@ -214,7 +220,7 @@ local function restartHud()
         show = true,
     })
     Wait(500)
-    QBCore.Functions.Notify(Lang:t("notify.hud_start"), "success")
+    QBCore.Functions.Notify(Lang:t("notify.hud_start"), "success") -- @todo replace with ox_lib notify
     SendNUIMessage({
         action = 'menu',
         topic = 'restart',
@@ -243,7 +249,7 @@ RegisterNetEvent("hud:client:resetStorage", function()
     if Menu.isResetSoundsChecked then
         TriggerServerEvent("InteractSound_SV:PlayOnSource", "airwrench", 0.1)
     end
-    QBCore.Functions.TriggerCallback('hud:server:getMenu', function(menu) loadSettings(menu); SetResourceKvp('hudSettings', json.encode(menu)) end)
+    QBCore.Functions.TriggerCallback('hud:server:getMenu', function(menu) loadSettings(menu); SetResourceKvp('hudSettings', json.encode(menu)) end) -- @todo
 end)
 
 -- Notifications
@@ -479,7 +485,7 @@ RegisterNetEvent("hud:client:LoadMap", function()
         end
         Wait(1200)
         if Menu.isMapNotifChecked then
-            QBCore.Functions.Notify(Lang:t("notify.loaded_circle_map"))
+            QBCore.Functions.Notify(Lang:t("notify.loaded_circle_map")) -- @todo
         end
     end
 end)
@@ -579,12 +585,12 @@ RegisterNUICallback('cinematicMode', function(data, cb)
     if data.checked then
         CinematicShow(true)
         if Menu.isCinematicNotifChecked then
-            QBCore.Functions.Notify(Lang:t("notify.cinematic_on"))
+            QBCore.Functions.Notify(Lang:t("notify.cinematic_on")) -- @todo
         end
     else
         CinematicShow(false)
         if Menu.isCinematicNotifChecked then
-            QBCore.Functions.Notify(Lang:t("notify.cinematic_off"), 'error')
+            QBCore.Functions.Notify(Lang:t("notify.cinematic_off"), 'error') -- @todo
         end
         local player = PlayerPedId()
         local vehicle = GetVehiclePedIsIn(player)
@@ -623,12 +629,12 @@ RegisterNetEvent('hud:client:ToggleAirHud', function()
     showAltitude = not showAltitude
 end)
 
-RegisterNetEvent('hud:client:UpdateNeeds', function(newHunger, newThirst) -- Triggered in qb-core
+RegisterNetEvent('hud:client:UpdateNeeds', function(newHunger, newThirst) -- Triggered in qb-core -- @todo
     hunger = newHunger
     thirst = newThirst
 end)
 
-RegisterNetEvent('hud:client:UpdateStress', function(newStress) -- Add this event with adding stress elsewhere
+RegisterNetEvent('hud:client:UpdateStress', function(newStress) -- Add this event with adding stress elsewhere -- @todo remove stress
     stress = newStress
 end)
 
@@ -636,24 +642,24 @@ RegisterNetEvent('hud:client:ToggleShowSeatbelt', function()
     showSeatbelt = not showSeatbelt
 end)
 
-RegisterNetEvent('seatbelt:client:ToggleSeatbelt', function() -- Triggered in smallresources
+RegisterNetEvent('seatbelt:client:ToggleSeatbelt', function() -- Triggered in smallresources -- @todo
     seatbeltOn = not seatbeltOn
 end)
 
-RegisterNetEvent('seatbelt:client:ToggleCruise', function() -- Triggered in smallresources
+RegisterNetEvent('seatbelt:client:ToggleCruise', function() -- Triggered in smallresources -- @todo
     cruiseOn = not cruiseOn
 end)
 
-RegisterNetEvent('hud:client:UpdateNitrous', function(hasNitro, nitroLevel, bool)
+RegisterNetEvent('hud:client:UpdateNitrous', function(hasNitro, nitroLevel, bool) -- @todo
     nos = nitroLevel
     nitroActive = bool
 end)
 
-RegisterNetEvent('hud:client:UpdateHarness', function(harnessHp)
+RegisterNetEvent('hud:client:UpdateHarness', function(harnessHp) -- @todo
     hp = harnessHp
 end)
 
-RegisterNetEvent("qb-admin:client:ToggleDevmode", function()
+RegisterNetEvent("qb-admin:client:ToggleDevmode", function() -- @todo
     dev = not dev
 end)
 
@@ -662,7 +668,7 @@ RegisterNetEvent('hud:client:UpdateUISettings', function(data)
     sendUIUpdateMessage(data)
 end)
 
---- Send player buff infomation to nui
+--- Send player buff infomation to nui -- @note this could be used for external stuff
 --- @param data table - Buff data
 --  {
 --      display: boolean - Whether to show buff or not
@@ -723,7 +729,7 @@ RegisterNetEvent('hud:client:EnhancementEffect', function(data)
     end
 end)
 
-RegisterCommand('+engine', function()
+--[[RegisterCommand('+engine', function() -- @note handled
     local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
     if vehicle == 0 or GetPedInVehicleSeat(vehicle, -1) ~= PlayerPedId() then return end
     if GetIsVehicleEngineRunning(vehicle) then
@@ -734,9 +740,9 @@ RegisterCommand('+engine', function()
     SetVehicleEngineOn(vehicle, not GetIsVehicleEngineRunning(vehicle), false, true)
 end)
 
-RegisterKeyMapping('+engine', Lang:t('info.toggle_engine'), 'keyboard', 'G')
+RegisterKeyMapping('+engine', Lang:t('info.toggle_engine'), 'keyboard', 'G')]]
 
-local function IsWhitelistedWeaponArmed(weapon)
+local function IsWhitelistedWeaponArmed(weapon) -- @note what does this do?
     if weapon then
         for _, v in pairs(config.WhitelistedWeaponArmed) do
             if weapon == v then
@@ -886,7 +892,7 @@ CreateThread(function()
                 end
             end
 
-            playerDead = IsEntityDead(player) or PlayerData.metadata["inlaststand"] or PlayerData.metadata["isdead"] or false
+            playerDead = IsEntityDead(player) or PlayerData.metadata["inlaststand"] or PlayerData.metadata["isdead"] or false -- @todo check this metadata
             parachute = GetPedParachuteState(player)
 
             -- Stamina
@@ -1020,7 +1026,7 @@ CreateThread(function()
     end
 end)
 
-function isElectric(vehicle)
+function isElectric(vehicle) -- @todo pull this from og_vehicleutils
     local noBeeps = false
     for k, v in pairs(Config.FuelBlacklist) do
         if GetEntityModel(vehicle) == GetHashKey(v) then
@@ -1051,7 +1057,7 @@ end)
 
 -- Money HUD
 
-RegisterNetEvent('hud:client:ShowAccounts', function(type, amount)
+RegisterNetEvent('hud:client:ShowAccounts', function(type, amount) -- @todo convert
     if type == 'cash' then
         SendNUIMessage({
             action = 'show',
@@ -1067,7 +1073,7 @@ RegisterNetEvent('hud:client:ShowAccounts', function(type, amount)
     end
 end)
 
-RegisterNetEvent('hud:client:OnMoneyChange', function(type, amount, isMinus)
+RegisterNetEvent('hud:client:OnMoneyChange', function(type, amount, isMinus) -- @todo convert
     cashAmount = PlayerData.money['cash']
     bankAmount = PlayerData.money['bank']
     SendNUIMessage({
@@ -1082,7 +1088,7 @@ end)
 
 -- Harness Check / Seatbelt Check
 
-CreateThread(function()
+CreateThread(function() -- @todo convert
     while true do
         Wait(1500)
         if LocalPlayer.state.isLoggedIn then
@@ -1100,7 +1106,7 @@ end)
 
 
 -- Stress Gain
-
+--[[
 CreateThread(function() -- Speeding
     while true do
         if LocalPlayer.state.isLoggedIn then
@@ -1210,6 +1216,7 @@ CreateThread(function()
         end
     end
 end)
+]]
 
 -- Minimap update
 CreateThread(function()

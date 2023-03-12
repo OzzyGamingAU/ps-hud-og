@@ -1,23 +1,23 @@
-local QBCore = exports['qb-core']:GetCoreObject()
+local QBCore = exports['qb-core']:GetCoreObject() -- @todo convert
 local ResetStress = false
 
-QBCore.Commands.Add('cash', Lang:t('info.check_cash_balance'), {}, false, function(source, args)
+QBCore.Commands.Add('cash', Lang:t('info.check_cash_balance'), {}, false, function(source, args) -- @todo convert
     local Player = QBCore.Functions.GetPlayer(source)
     local cashamount = Player.PlayerData.money.cash
     TriggerClientEvent('hud:client:ShowAccounts', source, 'cash', cashamount)
 end)
 
-QBCore.Commands.Add('bank', Lang:t('info.check_bank_balance'), {}, false, function(source, args)
+QBCore.Commands.Add('bank', Lang:t('info.check_bank_balance'), {}, false, function(source, args) -- @todo convert
     local Player = QBCore.Functions.GetPlayer(source)
     local bankamount = Player.PlayerData.money.bank
     TriggerClientEvent('hud:client:ShowAccounts', source, 'bank', bankamount)
 end)
 
-QBCore.Commands.Add("dev", Lang:t('info.toggle_dev_mode'), {}, false, function(source, args)
+QBCore.Commands.Add("dev", Lang:t('info.toggle_dev_mode'), {}, false, function(source, args) -- @todo convert
     TriggerClientEvent("qb-admin:client:ToggleDevmode", source)
 end, 'admin')
 
-RegisterNetEvent('hud:server:GainStress', function(amount)
+--[[RegisterNetEvent('hud:server:GainStress', function(amount)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     local newStress
@@ -59,17 +59,17 @@ RegisterNetEvent('hud:server:RelieveStress', function(amount)
     Player.Functions.SetMetaData('stress', newStress)
     TriggerClientEvent('hud:client:UpdateStress', src, newStress)
     TriggerClientEvent('QBCore:Notify', src, Lang:t("notify.stress_removed"))
-end)
+end)]]
 
 RegisterNetEvent('hud:server:saveUIData', function(data)
     local src = source
 	-- Check Permissions
-    if not QBCore.Functions.HasPermission(src, 'admin') and not IsPlayerAceAllowed(src, 'command') then
+    if not QBCore.Functions.HasPermission(src, 'admin') and not IsPlayerAceAllowed(src, 'command') then -- @todo convert
 		return
 	end
 
     -- Ensure a player is invoking this net event
-    local Player = QBCore.Functions.GetPlayer(src)
+    local Player = QBCore.Functions.GetPlayer(src) -- @todo convert
 	if not Player then return end
 
     local uiConfigData = {}
@@ -194,11 +194,11 @@ RegisterNetEvent('hud:server:saveUIData', function(data)
     TriggerClientEvent('hud:client:UpdateUISettings', -1, uiConfigData)
 end)
 
-QBCore.Functions.CreateCallback('hud:server:getMenu', function(source, cb)
+QBCore.Functions.CreateCallback('hud:server:getMenu', function(source, cb) -- @todo convert
     cb(Config.Menu)
 end) 
 
-QBCore.Functions.CreateCallback('hud:server:getRank', function(source, cb)
+QBCore.Functions.CreateCallback('hud:server:getRank', function(source, cb) -- @todo convert
     local src = source
     if QBCore.Functions.HasPermission(src, 'admin') or IsPlayerAceAllowed(src, 'command') then
         cb(true)
