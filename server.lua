@@ -1,23 +1,29 @@
-local QBCore = exports['qb-core']:GetCoreObject() -- @todo convert
-local ResetStress = false
+local ESX = nil
+TriggerEvent('og:getData', function(obj) ESX = obj end)
 
-QBCore.Commands.Add('cash', Lang:t('info.check_cash_balance'), {}, false, function(source, args) -- @todo convert
+local ResetStress = false
+--[[
+QBCore.Commands.Add('cash', Lang:t('info.check_cash_balance'), {}, false, function(source, args)
     local Player = QBCore.Functions.GetPlayer(source)
     local cashamount = Player.PlayerData.money.cash
     TriggerClientEvent('hud:client:ShowAccounts', source, 'cash', cashamount)
 end)
 
-QBCore.Commands.Add('bank', Lang:t('info.check_bank_balance'), {}, false, function(source, args) -- @todo convert
+QBCore.Commands.Add('bank', Lang:t('info.check_bank_balance'), {}, false, function(source, args)
     local Player = QBCore.Functions.GetPlayer(source)
     local bankamount = Player.PlayerData.money.bank
     TriggerClientEvent('hud:client:ShowAccounts', source, 'bank', bankamount)
 end)
+]]
 
-QBCore.Commands.Add("dev", Lang:t('info.toggle_dev_mode'), {}, false, function(source, args) -- @todo convert
+--[[
+QBCore.Commands.Add("dev", Lang:t('info.toggle_dev_mode'), {}, false, function(source, args) -- @note not sure if we have any use for this TBH, perhaps to replace vests eventually, but im going to leave it for now
     TriggerClientEvent("qb-admin:client:ToggleDevmode", source)
 end, 'admin')
+]]
 
---[[RegisterNetEvent('hud:server:GainStress', function(amount)
+--[[
+    RegisterNetEvent('hud:server:GainStress', function(amount)
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     local newStress
@@ -64,13 +70,16 @@ end)]]
 RegisterNetEvent('hud:server:saveUIData', function(data)
     local src = source
 	-- Check Permissions
-    if not QBCore.Functions.HasPermission(src, 'admin') and not IsPlayerAceAllowed(src, 'command') then -- @todo convert
+    if not QBCore.Functions.HasPermission(src, 'admin') and not IsPlayerAceAllowed(src, 'command') then -- @todo change to staffrank
 		return
 	end
 
     -- Ensure a player is invoking this net event
+    --[[
     local Player = QBCore.Functions.GetPlayer(src) -- @todo convert
 	if not Player then return end
+    ]]
+    if src == 0 then return end
 
     local uiConfigData = {}
     uiConfigData.icons = {}
@@ -194,11 +203,11 @@ RegisterNetEvent('hud:server:saveUIData', function(data)
     TriggerClientEvent('hud:client:UpdateUISettings', -1, uiConfigData)
 end)
 
-QBCore.Functions.CreateCallback('hud:server:getMenu', function(source, cb) -- @todo convert
+QBCore.Functions.CreateCallback('hud:server:getMenu', function(source, cb) -- @todo convert to ox_lib callback
     cb(Config.Menu)
 end) 
 
-QBCore.Functions.CreateCallback('hud:server:getRank', function(source, cb) -- @todo convert
+QBCore.Functions.CreateCallback('hud:server:getRank', function(source, cb) -- @todo convert ox_lib callback
     local src = source
     if QBCore.Functions.HasPermission(src, 'admin') or IsPlayerAceAllowed(src, 'command') then
         cb(true)
